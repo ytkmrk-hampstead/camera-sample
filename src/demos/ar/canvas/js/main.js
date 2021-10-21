@@ -48,11 +48,30 @@ function drawMeasure() {
   }
 }
 
+function drawBottle() {
+  let canvas = document.getElementById('overlay');
+  if (canvas.getContext) {
+    let context = canvas.getContext('2d');
+
+    let image = new Image();
+    image.src = './image/plastic_bottle_01.png';
+    image.onload = () => {
+      let measureWidth = windowWidth / 10;
+      let measureHeight = measureWidth / 0.32;
+      let measureX = targetRectX + 2;
+      let measureY = (targetRectY + targetRectHeight) - measureHeight;
+      context.globalAlpha = 0.5;
+      context.drawImage(image, measureX, measureY, measureWidth, measureHeight);
+    }
+  }
+}
+
 window.onload = function() {
   let canvas = document.getElementById('overlay');
   canvas.width = windowWidth = window.innerWidth;
   canvas.height = windowHeight = window.innerHeight;
 
   drawTargetRect();
-  drawMeasure();
+  // drawMeasure();
+  drawBottle();
 }
