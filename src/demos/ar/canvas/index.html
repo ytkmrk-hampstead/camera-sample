@@ -21,7 +21,12 @@
 
 <body>
 
-<a-scene embedded arjs="debugUIEnabled:false;trackingMethod:best;" vr-mode-ui="enabled: false">
+<!--<a-scene embedded arjs="debugUIEnabled:false;trackingMethod:best;" vr-mode-ui="enabled: false">-->
+<a-scene arjs="debugUIEnabled: false;" vr-mode-ui="enabled: false;"
+         webxr="debugUIEnabled:false;
+                requiredFeatures: hit-test,local-floor;
+                optionalFeatures: dom-overlay,unbounded;
+                overlayElement: #overlay;">
     <a-entity>
         <a-camera></a-camera>
     </a-entity>
