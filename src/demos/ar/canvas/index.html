@@ -18,12 +18,17 @@
     <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
 
     <style>
-        #overlay {
+        #overlay-target, #overlay-measure {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+        }
+        #overlay-target {
+            z-index: 998;
+        }
+        #overlay-measure {
             z-index: 999;
         }
     </style>
@@ -41,7 +46,8 @@
 
 </a-scene>
 
-<canvas id="overlay"></canvas>
+<canvas id="overlay-target"></canvas>
+<canvas id="overlay-measure"></canvas>
 
 <script src="js/main.js?r=202110211440" async></script>
 
