@@ -21,6 +21,8 @@ let measureSizeInMM = 300;
 
 let targetRatio = 1.5;
 
+let fontStyle = "14px san-serif";
+
 let pixelPerMM;
 
 function drawTargetRect() {
@@ -44,39 +46,24 @@ function drawMeasure() {
   let canvas = document.getElementById('overlay-measure');
   if (canvas.getContext) {
     let context = canvas.getContext('2d');
+    context.clearRect(0, 0, windowWidth, windowHeight);
 
     let image = new Image();
     image.src = './image/measure.png';
     image.onload = () => {
+      context.save();
       let measureWidth = measureSizeInMM * pixelPerMM;
       let measureHeight = measureWidth * (image.height / image.width);
       let measureX = targetX;
       let measureY = targetY + targetHeight;
       context.globalAlpha = 0.5;
       context.drawImage(image, measureX, measureY, measureWidth, measureHeight);
+      context.restore();
 
-      console.log(measureX);
-      console.log(measureY);
-      console.log(measureWidth);
-      console.log(measureHeight);
-    }
-  }
-}
-
-function drawBottle() {
-  let canvas = document.getElementById('overlay-target');
-  if (canvas.getContext) {
-    let context = canvas.getContext('2d');
-
-    let image = new Image();
-    image.src = './image/plastic_bottle_01.png';
-    image.onload = () => {
-      let measureWidth = windowWidth / 10;
-      let measureHeight = measureWidth / 0.32;
-      let measureX = targetRectX + 2;
-      let measureY = (targetRectY + targetRectHeight) - measureHeight;
-      context.globalAlpha = 0.5;
-      context.drawImage(image, measureX, measureY, measureWidth, measureHeight);
+      context.textBaseline = "top";
+      context.textAlign = "right";
+      drawText(context, Math.ceil(measureSizeInMM / 10) + "cm", measureX + measureWidth, measureY + measureHeight + 2);
+      context.restore();
     }
   }
 }
@@ -85,23 +72,57 @@ function drawTarget() {
   let canvas = document.getElementById('overlay-target');
   if (canvas.getContext) {
     let context = canvas.getContext('2d');
+    context.clearRect(0, 0, windowWidth, windowHeight);
 
     let image = new Image();
     image.src = './image/image_icebox.png';
     image.onload = () => {
+      context.save();
       context.globalAlpha = 1.0;
       context.drawImage(image, targetX, targetY, targetWidth, targetHeight);
+      context.restore();
+
+      context.textBaseline = "bottom";
+      context.textAlign = "right";
+      drawText(context, Math.ceil(targetWidthInMM / 10) + "cm", targetX + targetWidth, targetY - 2);
+      context.restore();
+
+      context.textBaseline = "top";
+      context.textAlign = "left";
+      drawText(context, Math.ceil(targetHeightInMM / 10) + "cm", targetX + targetWidth + 2, targetY + 2);
+      context.restore();
     }
   }
 }
 
+function drawText(context, text, x, y) {
+  context.globalAlpha = 1;
+  context.font = fontStyle;
+  context.shadowColor = "#000000";
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.shadowBlur = 1;
+  context.strokeStyle = "#000000";
+  context.strokeText(text, x, y);
+  context.fillStyle = "#ffffff";
+  context.fillText(text, x, y);
+}
 
-window.onload = function() {
-  let canvasTarget = document.getElementById('overlay-target');
-  let canvasMeasure = document.getElementById('overlay-measure');
-  canvasMeasure.width = canvasTarget.width = windowWidth = window.innerWidth;
-  canvasMeasure.height =canvasTarget.height = windowHeight = window.innerHeight;
+function zoomIn() {
+  console.log('zoomIn');
 
+  targetRatio -= 0.1;
+  updateCanvas();
+}
+
+function zoomOut() {
+  console.log('zoomOut');
+
+  targetRatio += 0.1;
+  updateCanvas();
+}
+
+function updateCanvas() {
   if (targetAspectRatio < 1) {
     targetHeight = windowHeight / targetRatio;
     targetWidth = targetHeight * targetAspectRatio;
@@ -115,4 +136,14 @@ window.onload = function() {
 
   drawTarget();
   drawMeasure();
+}
+
+window.onload = function() {
+  let canvasTarget = document.getElementById('overlay-target');
+  let canvasMeasure = document.getElementById('overlay-measure');
+  let divControl = document.getElementById('overlay-control');
+  divControl.width = canvasMeasure.width = canvasTarget.width = windowWidth = window.innerWidth;
+  divControl.width = canvasMeasure.height =canvasTarget.height = windowHeight = window.innerHeight;
+
+  updateCanvas();
 }

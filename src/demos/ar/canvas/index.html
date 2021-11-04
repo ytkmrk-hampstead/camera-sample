@@ -12,13 +12,14 @@
     <title>AR.js to canvas</title>
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="css/main.css">
 
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
 
     <style>
-        #overlay-target, #overlay-measure {
+        #overlay-target, #overlay-measure, #overlay-control {
             position: absolute;
             top: 0;
             left: 0;
@@ -26,10 +27,20 @@
             height: 100%;
         }
         #overlay-target {
-            z-index: 998;
+            z-index: 997;
         }
         #overlay-measure {
-            z-index: 999;
+            z-index: 998;
+        }
+        #overlay-control {
+            z-index: 998;
+        }
+        .control {
+            color: #ffffff;
+            font-size: 24px;
+            text-shadow: #000000 1px 1px 3px;
+            margin: 8px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -48,6 +59,10 @@
 
 <canvas id="overlay-target"></canvas>
 <canvas id="overlay-measure"></canvas>
+<div id="overlay-control">
+    <div><i class="fas fa-plus-circle control" onclick="zoomIn();"></i></div>
+    <div><i class="fas fa-minus-circle control" onclick="zoomOut();"></i></div>
+</div>
 
 <script src="js/main.js?r=202110271652" async></script>
 
