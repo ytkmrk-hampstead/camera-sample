@@ -21,7 +21,7 @@ let measureSizeInMM = 300;
 
 let targetRatio = 1.5;
 
-let fontStyle = "14px san-serif";
+let fontStyle = "14px sans-serif";
 
 let pixelPerMM;
 
