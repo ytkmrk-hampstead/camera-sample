@@ -68,9 +68,7 @@
         let camera = document.getElementById('camera');
         if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: { exact: "environment" }
-                },
+                video: true,
                 audio: false
             }).then(function(stream) {
                 camera.srcObject = stream;
