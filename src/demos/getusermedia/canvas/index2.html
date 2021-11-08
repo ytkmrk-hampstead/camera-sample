@@ -14,18 +14,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
-        html {
-        }
-        body {
-            font-family: 'Roboto', sans-serif;
-            font-weight: 300;
-            margin: 0;
-            padding: 0;
-            word-break: break-word;
-        }
         #camera {
-            width: 100%;
-            height: 100%;
+            width: 640px;
+            height: 480px;
         }
         #overlay-target, #overlay-measure, #overlay-control {
             position: absolute;
@@ -67,15 +58,16 @@
     const adjustCamera = function() {
         let camera = document.getElementById('camera');
         navigator.mediaDevices.getUserMedia({
-            video: true,
+            video: {
+                facingMode: { exact: "environment" }
+            },
             audio: false
         }).then(function(stream) {
             camera.srcObject = stream;
-            camera.play();
+            camera.onloadedmetadata = function() {
+                camera.play();
+            }
         });
-
-        camera.onloadedmetadata = function() {
-        }
     }
 
     window.onload = function() {
