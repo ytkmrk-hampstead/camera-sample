@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <base target="_blank">
+
+    <title>設置確認アプリ</title>
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="css/main.css">
+
+    <script src="js/aframe/aframe.min.js"></script>
+    <script src="js/aframe/aframe-ar.js"></script>
+
+    <style>
+        body {
+            background-color: #808080;
+        }
+        #overlay-target, #overlay-measure, #overlay-control {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #overlay-target {
+            z-index: 997;
+        }
+        #overlay-measure {
+            z-index: 998;
+        }
+        #overlay-control {
+            z-index: 999;
+            width: auto;
+            height: auto;
+        }
+        .control {
+            color: #ffffff;
+            font-size: 24px;
+            text-shadow: #000000 1px 1px 3px;
+            margin: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<a-scene arjs="debugUIEnabled: false;"
+         vr-mode-ui="enabled: false;"
+         webxr="requiredFeatures: hit-test,local-floor;
+                optionalFeatures: unbounded;">
+    <a-entity>
+        <a-camera></a-camera>
+    </a-entity>
+</a-scene>
+
+<canvas id="overlay-target"></canvas>
+<div id="overlay-control">
+    <div><i class="fas fa-plus-circle control" id="zoom-in-button"></i></div>
+    <div><i class="fas fa-minus-circle control" id="zoom-out-button"></i></div>
+    <div><i class="fas fa-arrow-alt-circle-up control" id="move-up-button"></i></div>
+    <div><i class="fas fa-arrow-alt-circle-down control" id="move-down-button"></i></div>
+</div>
+
+<script src="js/main.js?r=202111081200" type="module"></script>
+
+</body>
+
+</html>
