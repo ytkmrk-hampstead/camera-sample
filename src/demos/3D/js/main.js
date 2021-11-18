@@ -50,10 +50,17 @@ animate();
 
 initControls();
 
+window.addEventListener('orientationchange', function() {
+  console.log('orientationchange');
+
+  location.reload();
+});
+
 function init() {
   canvasTarget = document.getElementById('overlay-target');
   canvasTarget.width = windowWidth = window.innerWidth;
   canvasTarget.height = windowHeight = window.innerHeight;
+  console.log('windowWidth: ' + windowWidth + ' windowHeight: ' + windowHeight);
 
   initSizing();
 
@@ -146,10 +153,10 @@ function drawTarget() {
     new THREE.MeshPhongMaterial(materialParam),
     new THREE.MeshPhongMaterial(materialParam),
     new THREE.MeshPhongMaterial(materialParam),
-    new THREE.MeshPhongMaterial(materialParam),
-    // new THREE.MeshBasicMaterial(Object.assign(materialParam, {
-    //   map: loader.load( './image/air-conditioner.png' )
-    // })),
+    // new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshBasicMaterial(Object.assign(materialParam, {
+      map: loader.load( './image/air-conditioner.png' )
+    })),
     new THREE.MeshPhongMaterial(materialParam)
   ];
   let geometryTarget = new THREE.BoxGeometry(targetWidth, targetHeight, targetDepth);
