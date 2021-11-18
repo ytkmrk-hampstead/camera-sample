@@ -130,18 +130,27 @@ function drawTarget() {
 
   // Light
   let light = new THREE.HemisphereLight(0xFFFFFF, 0x404040, 1.0);
-  light.position.set(-1, 2, 0);
+  light.position.set(-1, 2, 4);
   scene.add(light);
 
   // Target
   let loader = new THREE.TextureLoader();
+  let materialParam = {
+    side: THREE.DoubleSide,
+    color: 0xFFFFFF,
+    transparent: true,
+    opacity: 0.75
+  };
   let materialTexture = [
-    new THREE.MeshLambertMaterial(),
-    new THREE.MeshLambertMaterial(),
-    new THREE.MeshLambertMaterial(),
-    new THREE.MeshLambertMaterial(),
-    new THREE.MeshBasicMaterial({map: loader.load( './image/air-conditioner.png' )}),
-    new THREE.MeshLambertMaterial()
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam),
+    // new THREE.MeshBasicMaterial(Object.assign(materialParam, {
+    //   map: loader.load( './image/air-conditioner.png' )
+    // })),
+    new THREE.MeshPhongMaterial(materialParam)
   ];
   let geometryTarget = new THREE.BoxGeometry(targetWidth, targetHeight, targetDepth);
   let sphereTarget = new THREE.Mesh(geometryTarget, materialTexture);
