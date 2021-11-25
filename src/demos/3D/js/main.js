@@ -39,6 +39,7 @@ let canvasTargetTop = 0;
 let longPushTimer;
 let longPushTimerIntervalInMillis = 10;
 
+let video;
 
 const showHelpers = false;
 
@@ -81,8 +82,10 @@ function init() {
 
 function initWindow() {
   canvasTarget = document.getElementById('overlay-target');
-  canvasTarget.width = windowWidth = window.innerWidth;
-  canvasTarget.height = windowHeight = window.innerHeight;
+  video = document.querySelector('#screen-video');
+
+  video.width = canvasTarget.width = windowWidth = window.innerWidth;
+  video.height = canvasTarget.height = windowHeight = window.innerHeight;
   console.log('windowWidth: ' + windowWidth + ' windowHeight: ' + windowHeight);
 }
 
@@ -149,7 +152,6 @@ function initVideo() {
       facingMode: "environment"
     }
   }).then(function(stream) {
-    let video = document.querySelector('#screen-video');
     video.srcObject = stream;
     video.onloadedmetadata = function(e) {
       video.play();
@@ -328,7 +330,6 @@ function stopLongPushTimer() {
 }
 
 function togglePause() {
-  let video = document.querySelector('#screen-video');
   let toggleButton = document.querySelector('#toggle-pause-button');
   if (video.paused) {
     toggleButton.className = 'fas fa-pause-circle control';
