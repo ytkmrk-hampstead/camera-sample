@@ -111,6 +111,16 @@ function initControls() {
   document.querySelector('#move-up-button').onmouseleave = stopLongPushTimer;
   document.querySelector('#move-down-button').onmouseleave = stopLongPushTimer;
 
+  document.querySelector('#zoom-in-button').ontouchstart = zoomIn;
+  document.querySelector('#zoom-out-button').ontouchstart = zoomOut;
+  document.querySelector('#move-up-button').ontouchstart = moveUp;
+  document.querySelector('#move-down-button').ontouchstart = moveDown;
+
+  document.querySelector('#zoom-in-button').ontouchend = stopLongPushTimer;
+  document.querySelector('#zoom-out-button').ontouchend = stopLongPushTimer;
+  document.querySelector('#move-up-button').ontouchend = stopLongPushTimer;
+  document.querySelector('#move-down-button').ontouchend = stopLongPushTimer;
+
   document.querySelector('#toggle-pause-button').onclick = togglePause;
 }
 
