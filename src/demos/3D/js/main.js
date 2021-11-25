@@ -5,7 +5,6 @@ import { OrbitControls } from './three/jsm/controls/OrbitControls.js';
 // import { OBJLoader } from './three/jsm/loaders/OBJLoader.js';
 // import { MTLLoader } from './three/jsm/loaders/MTLLoader.js';
 
-let showHelpers = false;
 
 let windowWidth;
 let windowHeight;
@@ -16,10 +15,10 @@ let targetDepth;
 let targetX;
 let targetY;
 
-let targetWidthInMM = 798;
-let targetHeightInMM = 295;
-let targetDepthInMM = 370;
-let targetAspectRatio = targetWidthInMM / targetHeightInMM;
+let targetWidthInMM;
+let targetHeightInMM;
+let targetDepthInMM;
+let targetAspectRatio;
 
 let measureWidth;
 let measureHeight;
@@ -27,13 +26,6 @@ let measureDepth;
 let measureX;
 let measureY;
 let measureZ;
-
-let measureWidthInMM = 300;
-let measureHeightInMM = 50;
-
-let targetRatio = 1.5;
-
-let fontStyle = "14px sans-serif";
 
 let pixelPerMM;
 
@@ -44,11 +36,36 @@ let scene;
 let canvasTarget;
 let canvasTargetTop = 0;
 
-init();
+let longPushTimer;
+let longPushTimerIntervalInMillis = 10;
 
-animate();
 
-initControls();
+const showHelpers = false;
+
+const measureWidthInMM = 300;
+const measureHeightInMM = 50;
+
+const targetRatio = 1.5;
+const fontStyle = "14px sans-serif";
+
+const productTypeSizes = {
+  "T1": [ 799,  295,  385], // https://panasonic.jp/aircon/products/21x.html#size
+  "T2": [1123,  682,  247], // https://panasonic.jp/viera/p-db/TH-50JX750_spec.html
+  "T3": [ 750, 1828,  745]  // https://panasonic.jp/reizo/p-db/NR-F657WPX_spec.html
+};
+
+document.querySelector('#open-menu-button').onclick = openMenu;
+document.querySelector('#close-menu-button').onclick = closeMenu;
+document.querySelector('#input-product-type').onchange = menuChangeProduct;
+
+initWindow();
+initVideo();
+
+function update() {
+  init();
+  initControls();
+  animate();
+}
 
 window.addEventListener('orientationchange', function() {
   console.log('orientationchange');
@@ -57,21 +74,41 @@ window.addEventListener('orientationchange', function() {
 });
 
 function init() {
+  initInfo();
+  initSizing();
+  updateCanvas();
+}
+
+function initWindow() {
   canvasTarget = document.getElementById('overlay-target');
   canvasTarget.width = windowWidth = window.innerWidth;
   canvasTarget.height = windowHeight = window.innerHeight;
   console.log('windowWidth: ' + windowWidth + ' windowHeight: ' + windowHeight);
+}
 
-  initSizing();
-
-  updateCanvas();
+function initInfo() {
+  document.querySelector('#target-width').textContent = String(targetWidthInMM);
+  document.querySelector('#target-height').textContent = String(targetHeightInMM);
+  document.querySelector('#target-depth').textContent = String(targetDepthInMM);
 }
 
 function initControls() {
-  document.querySelector('#zoom-in-button').onclick = zoomIn;
-  document.querySelector('#zoom-out-button').onclick = zoomOut;
-  document.querySelector('#move-up-button').onclick = moveUp;
-  document.querySelector('#move-down-button').onclick = moveDown;
+  document.querySelector('#zoom-in-button').onmousedown = zoomIn;
+  document.querySelector('#zoom-out-button').onmousedown = zoomOut;
+  document.querySelector('#move-up-button').onmousedown = moveUp;
+  document.querySelector('#move-down-button').onmousedown = moveDown;
+
+  document.querySelector('#zoom-in-button').onmouseup = stopLongPushTimer;
+  document.querySelector('#zoom-out-button').onmouseup = stopLongPushTimer;
+  document.querySelector('#move-up-button').onmouseup = stopLongPushTimer;
+  document.querySelector('#move-down-button').onmouseup = stopLongPushTimer;
+
+  document.querySelector('#zoom-in-button').onmouseleave = stopLongPushTimer;
+  document.querySelector('#zoom-out-button').onmouseleave = stopLongPushTimer;
+  document.querySelector('#move-up-button').onmouseleave = stopLongPushTimer;
+  document.querySelector('#move-down-button').onmouseleave = stopLongPushTimer;
+
+  document.querySelector('#toggle-pause-button').onclick = togglePause;
 }
 
 function initSizing() {
@@ -99,6 +136,28 @@ function initSizing() {
   measureY = 0 - ((targetHeight + measureHeight) / 2);
   measureZ = 0 - (targetDepth / 2);
   console.log('measureX: ' + measureX + ', measureY: ' + measureY + ', measureZ: ' + measureZ);
+}
+
+function initVideo() {
+  console.log('initVideo');
+
+  navigator.mediaDevices.getUserMedia({
+    audio: false,
+    video: {
+      width: windowWidth,
+      height: windowHeight,
+      facingMode: "environment"
+    }
+  }).then(function(stream) {
+    let video = document.querySelector('#screen-video');
+    video.srcObject = stream;
+    video.onloadedmetadata = function(e) {
+      video.play();
+      console.log('initVideo: play');
+    };
+  }).catch(function(err) {
+    console.log('initVideo: error: ' + err.name + ' message: ' + err.message);
+  });
 }
 
 function updateCanvas() {
@@ -153,10 +212,7 @@ function drawTarget() {
     new THREE.MeshPhongMaterial(materialParam),
     new THREE.MeshPhongMaterial(materialParam),
     new THREE.MeshPhongMaterial(materialParam),
-    // new THREE.MeshPhongMaterial(materialParam),
-    new THREE.MeshBasicMaterial(Object.assign(materialParam, {
-      map: loader.load( './image/air-conditioner.png' )
-    })),
+    new THREE.MeshPhongMaterial(materialParam),
     new THREE.MeshPhongMaterial(materialParam)
   ];
   let geometryTarget = new THREE.BoxGeometry(targetWidth, targetHeight, targetDepth);
@@ -207,49 +263,129 @@ function render() {
   renderer.render(scene, camera);
 }
 
-function zoomIn() {
+function zoomIn(e) {
   console.log('zoomIn');
 
-  camera.fov = zoom(getFov(), "zoomIn");
-  camera.updateProjectionMatrix();
+  e.preventDefault();
+
+  longPushTimer = setInterval(function() {
+    camera.fov = zoom(camera.fov, "zoomIn");
+    camera.updateProjectionMatrix();
+  }, longPushTimerIntervalInMillis);
 }
 
-function zoomOut() {
+function zoomOut(e) {
   console.log('zoomOut');
 
-  camera.fov = zoom(getFov(), "zoomOut");
-  camera.updateProjectionMatrix();
+  e.preventDefault();
+
+  longPushTimer = setInterval(function() {
+    camera.fov = zoom(camera.fov, "zoomOut");
+    camera.updateProjectionMatrix();
+  }, longPushTimerIntervalInMillis);
 }
 
-function moveUp() {
+function moveUp(e) {
   console.log('moveUp');
 
-  moveVertical(-10);
+  e.preventDefault();
+
+  longPushTimer = setInterval(function() {
+    moveVertical(-2);
+  }, longPushTimerIntervalInMillis);
 }
 
-function moveDown() {
+function moveDown(e) {
   console.log('moveDown');
 
-  moveVertical(10);
+  e.preventDefault();
+
+  longPushTimer = setInterval(function() {
+    moveVertical(2);
+  }, longPushTimerIntervalInMillis);
 }
 
 function zoom(value, zoomType) {
   let ret = value;
-  if (value >= 20 && zoomType === 'zoomIn') {
-    ret =  value - 5;
-  } else if (value <= 75 && zoomType === 'zoomOut') {
-    ret = value + 5;
+  if (value > 10 && zoomType === 'zoomIn') {
+    ret =  value / 1.01;
+  } else if (value < 150 && zoomType === 'zoomOut') {
+    ret = value * 1.01;
   }
-  console.log('fov: ' + ret);
 
   return ret;
-}
-
-function getFov() {
-  return Math.floor((2 * Math.atan(camera.getFilmHeight() / 2 / camera.getFocalLength()) * 180) / Math.PI);
 }
 
 function moveVertical(inc) {
   canvasTargetTop += inc;
   canvasTarget.style.setProperty('top', String(canvasTargetTop) + 'px');
+}
+
+function stopLongPushTimer() {
+  if (longPushTimer) {
+    clearInterval(longPushTimer);
+  }
+}
+
+function togglePause() {
+  let video = document.querySelector('#screen-video');
+  let toggleButton = document.querySelector('#toggle-pause-button');
+  if (video.paused) {
+    toggleButton.className = 'fas fa-pause-circle control';
+    video.play();
+  } else {
+    toggleButton.className = 'fas fa-play-circle control';
+    video.pause();
+  }
+}
+
+function openMenu() {
+  console.log('openMenu');
+
+  let menu = document.querySelector('#overlay-menu');
+  menu.style.display = 'block';
+}
+
+
+function closeMenu() {
+  console.log('closeMenu');
+
+  let menu = document.querySelector('#overlay-menu');
+  menu.style.display = 'none';
+
+  let width = document.querySelector('#input-target-width').value;
+  let height = document.querySelector('#input-target-height').value;
+  let depth = document.querySelector('#input-target-depth').value;
+
+  if (!isNaN(width) && !isNaN(height) && !isNaN(depth)) {
+    targetWidthInMM = parseInt(width);
+    targetHeightInMM = parseInt(height);
+    targetDepthInMM = parseInt(depth);
+
+    if (targetWidthInMM > 0 && targetHeightInMM > 0 && targetDepthInMM > 0) {
+      targetAspectRatio = targetWidthInMM / targetHeightInMM;
+
+      update();
+    }
+  }
+}
+
+function menuChangeProduct() {
+  console.log('menuChangeProduct');
+
+  let width = "";
+  let height = "";
+  let depth = "";
+
+  let productType = document.querySelector('#input-product-type').value;
+  if (productType !== 'custom') {
+    let sizes = productTypeSizes[productType];
+    width = String(sizes[0]);
+    height = String(sizes[1]);
+    depth = String(sizes[2]);
+  }
+
+  document.querySelector('#input-target-width').value = width;
+  document.querySelector('#input-target-height').value = height;
+  document.querySelector('#input-target-depth').value = depth;
 }
