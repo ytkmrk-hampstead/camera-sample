@@ -57,6 +57,7 @@ const productTypeSizes = {
 
 document.querySelector('#open-menu-button').onclick = openMenu;
 document.querySelector('#close-menu-button').onclick = closeMenu;
+document.querySelector('#close-menu-button-large').onclick = closeMenu;
 document.querySelector('#input-product-type').onchange = menuChangeProduct;
 
 initWindow();
@@ -84,8 +85,8 @@ function initWindow() {
   canvasTarget = document.getElementById('overlay-target');
   video = document.querySelector('#screen-video');
 
-  video.width = canvasTarget.width = windowWidth = window.innerWidth;
-  video.height = canvasTarget.height = windowHeight = window.innerHeight;
+  canvasTarget.width = windowWidth = window.innerWidth;
+  canvasTarget.height = windowHeight = window.innerHeight;
   console.log('windowWidth: ' + windowWidth + ' windowHeight: ' + windowHeight);
 }
 
