@@ -2,8 +2,8 @@
 
 import * as THREE from './three/three.module.js';
 import { OrbitControls } from './three/jsm/controls/OrbitControls.js';
-// import { OBJLoader } from './three/jsm/loaders/OBJLoader.js';
-// import { MTLLoader } from './three/jsm/loaders/MTLLoader.js';
+import { OBJLoader } from './three/jsm/loaders/OBJLoader.js';
+import { MTLLoader } from './three/jsm/loaders/MTLLoader.js';
 
 
 let windowWidth;
@@ -19,6 +19,7 @@ let targetWidthInMM;
 let targetHeightInMM;
 let targetDepthInMM;
 let targetAspectRatio;
+let targetObjectConfiguration;
 
 let measureWidth;
 let measureHeight;
@@ -49,10 +50,10 @@ const measureHeightInMM = 50;
 const targetRatio = 1.5;
 const fontStyle = "14px sans-serif";
 
-const productTypeSizes = {
-  "T1": [ 799,  295,  385], // https://panasonic.jp/aircon/products/21x.html#size
-  "T2": [1123,  682,  247], // https://panasonic.jp/viera/p-db/TH-50JX750_spec.html
-  "T3": [ 750, 1828,  745]  // https://panasonic.jp/reizo/p-db/NR-F657WPX_spec.html
+const productsConfiguration = {
+  "T1": { size: { w: 799, h: 295, d: 385 }, object: { path: '/object/T1/' } }, // https://panasonic.jp/aircon/products/21x.html#size
+  "T2": { size: { w:1123, h: 682, d: 247 }, object: { path: '/object/T2/' } }, // https://panasonic.jp/viera/p-db/TH-50JX750_spec.html
+  "T3": { size: { w: 750, h:1828, d: 745 }, object: { path: '/object/T3/' } }  // https://panasonic.jp/reizo/p-db/NR-F657WPX_spec.html
 };
 
 document.querySelector('#open-menu-button').onclick = openMenu;
@@ -174,7 +175,6 @@ function initVideo() {
 }
 
 function updateCanvas() {
-  // draw3DModel();
   drawTarget();
 }
 
@@ -199,6 +199,12 @@ function drawTarget() {
     canvas: canvasTarget,
     antialias: true
   });
+  console.log(window.devicePixelRatio);
+  console.log(renderer.getPixelRatio());
+  console.log(width);
+  console.log(height);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(width, height);
 
   // Scene
   scene = new THREE.Scene();
@@ -213,24 +219,11 @@ function drawTarget() {
   scene.add(light);
 
   // Target
-  let loader = new THREE.TextureLoader();
-  let materialParam = {
-    side: THREE.DoubleSide,
-    color: 0xFFFFFF,
-    transparent: true,
-    opacity: 0.75
-  };
-  let materialTexture = [
-    new THREE.MeshPhongMaterial(materialParam),
-    new THREE.MeshPhongMaterial(materialParam),
-    new THREE.MeshPhongMaterial(materialParam),
-    new THREE.MeshPhongMaterial(materialParam),
-    new THREE.MeshPhongMaterial(materialParam),
-    new THREE.MeshPhongMaterial(materialParam)
-  ];
-  let geometryTarget = new THREE.BoxGeometry(targetWidth, targetHeight, targetDepth);
-  let sphereTarget = new THREE.Mesh(geometryTarget, materialTexture);
-  scene.add(sphereTarget);
+  if (targetObjectConfiguration !== null) {
+    drawTargetModel();
+  } else {
+    drawTargetRect();
+  }
 
   // Measure
   let texture = new THREE.TextureLoader().load('./image/measure.png', function(texture) {
@@ -266,9 +259,71 @@ function drawTarget() {
   render();
 }
 
+function drawTargetModel() {
+  let opMaterial = new THREE.MeshPhongMaterial({
+        side: THREE.DoubleSide,
+        color: 0xFFFFFF,
+        transparent: true,
+        opacity: 0.50
+      });
+
+  let mtlLoader = new MTLLoader();
+  mtlLoader.setPath(targetObjectConfiguration.path);
+  mtlLoader.load('model.mtl', function (materials) {
+    materials.preload();
+
+    let objLoader = new OBJLoader();
+    objLoader.setMaterials(materials);
+    objLoader.setPath(targetObjectConfiguration.path);
+    objLoader.load('model.obj', function(root) {
+      root.traverse(function(node) {
+        if (node instanceof THREE.Mesh) {
+          node.material = opMaterial;
+        }
+      });
+
+      let box = new THREE.Box3().setFromObject(root);
+      let boxSize = box.getSize(new THREE.Vector3());
+      let scaleX = targetWidth / boxSize.x;
+      let scaleY = targetHeight / boxSize.y;
+      let scaleZ = targetDepth / boxSize.z;
+
+      root.scale.set(scaleX, scaleY, scaleZ);
+      console.log('scaleX: ' + scaleX);
+      console.log('scaleY: ' + scaleY);
+      console.log('scaleZ: ' + scaleZ);
+
+      scene.add(root);
+    });
+  });
+}
+
+function drawTargetRect() {
+  let loader = new THREE.TextureLoader();
+  let materialParam = {
+    side: THREE.DoubleSide,
+    color: 0xFFFFFF,
+    transparent: true,
+    opacity: 0.75
+  };
+  let materialTexture = [
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam),
+    new THREE.MeshPhongMaterial(materialParam)
+  ];
+  let geometryTarget = new THREE.BoxGeometry(targetWidth, targetHeight, targetDepth);
+  let sphereTarget = new THREE.Mesh(geometryTarget, materialTexture);
+  scene.add(sphereTarget);
+}
+
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
+
+  // If needed animation.
   render();
 }
 
@@ -284,6 +339,7 @@ function zoomIn(e) {
   longPushTimer = setInterval(function() {
     camera.fov = zoom(camera.fov, "zoomIn");
     camera.updateProjectionMatrix();
+    render();
   }, longPushTimerIntervalInMillis);
 }
 
@@ -295,6 +351,7 @@ function zoomOut(e) {
   longPushTimer = setInterval(function() {
     camera.fov = zoom(camera.fov, "zoomOut");
     camera.updateProjectionMatrix();
+    render();
   }, longPushTimerIntervalInMillis);
 }
 
@@ -391,10 +448,14 @@ function menuChangeProduct() {
 
   let productType = document.querySelector('#input-product-type').value;
   if (productType !== 'custom') {
-    let sizes = productTypeSizes[productType];
-    width = String(sizes[0]);
-    height = String(sizes[1]);
-    depth = String(sizes[2]);
+    let size = productsConfiguration[productType].size;
+    console.log(size);
+    width = String(size.w);
+    height = String(size.h);
+    depth = String(size.d);
+    targetObjectConfiguration = productsConfiguration[productType].object;
+  } else {
+    targetObjectConfiguration = null;
   }
 
   document.querySelector('#input-target-width').value = width;
