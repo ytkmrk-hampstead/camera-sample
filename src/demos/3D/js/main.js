@@ -51,9 +51,9 @@ const targetRatio = 1.5;
 const fontStyle = "14px sans-serif";
 
 const productsConfiguration = {
-  "T1": { size: { w: 799, h: 295, d: 385 }, object: { path: '/object/T1/' } }, // https://panasonic.jp/aircon/products/21x.html#size
-  "T2": { size: { w:1123, h: 682, d: 247 }, object: { path: '/object/T2/' } }, // https://panasonic.jp/viera/p-db/TH-50JX750_spec.html
-  "T3": { size: { w: 750, h:1828, d: 745 }, object: { path: '/object/T3/' } }  // https://panasonic.jp/reizo/p-db/NR-F657WPX_spec.html
+  "T1": { size: { w: 799, h: 295, d: 385 }, object: { path: 'object/T1/' } }, // https://panasonic.jp/aircon/products/21x.html#size
+  "T2": { size: { w:1123, h: 682, d: 247 }, object: { path: 'object/T2/' } }, // https://panasonic.jp/viera/p-db/TH-50JX750_spec.html
+  "T3": { size: { w: 750, h:1828, d: 745 }, object: { path: 'object/T3/' } }  // https://panasonic.jp/reizo/p-db/NR-F657WPX_spec.html
 };
 
 document.querySelector('#open-menu-button').onclick = openMenu;
