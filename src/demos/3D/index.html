@@ -8,7 +8,7 @@
 
     <base target="_blank">
 
-    <title>test</title>
+    <title>設置確認</title>
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,400,500,700" rel="stylesheet" type="text/css">
@@ -145,9 +145,9 @@
 <video autoplay playsinline id="screen-video"></video>
 
 <div id="overlay-info">
-    <div>WIDTH : <span id="target-width"></span>mm</div>
-    <div>HEIGHT: <span id="target-height"></span>mm</div>
-    <div>DEPTH : <span id="target-depth"></span>mm</div>
+    <div>幅　 : <span id="target-width"></span>mm</div>
+    <div>高さ : <span id="target-height"></span>mm</div>
+    <div>奥行 : <span id="target-depth"></span>mm</div>
 </div>
 
 <canvas id="overlay-target"></canvas>
@@ -167,25 +167,25 @@
 <div id="overlay-menu">
     <div class="close-button"><i class="fas fa-times control" id="close-menu-button"></i></div>
     <div>
-        <label for="input-product-type">Product</label>
+        <label for="input-product-type">商品</label>
         <select id="input-product-type">
-            <option value="custom">Custom</option>
-            <option value="T1">Air conditioner</option>
-            <option value="T2">Television</option>
-            <option value="T3">Refrigerator</option>
+            <option value="custom">カスタム</option>
+            <option value="T1">エアコン</option>
+            <option value="T2">液晶テレビ</option>
+            <option value="T3">冷蔵庫</option>
         </select>
     </div>
     <div>
-        <label for="input-target-width">Width(mm)</label>
-        <input type="text" placeholder="width(mm)" id="input-target-width"/>
+        <label for="input-target-width">幅　(mm)</label>
+        <input type="text" placeholder="幅(mm)" id="input-target-width"/>
     </div>
     <div>
-        <label for="input-target-height">Height(mm)</label>
-        <input type="text" placeholder="height(mm)" id="input-target-height"/>
+        <label for="input-target-height">高さ(mm)</label>
+        <input type="text" placeholder="高さ(mm)" id="input-target-height"/>
     </div>
     <div>
-        <label for="input-target-depth">Depth(mm)</label>
-        <input type="text" placeholder="depth(mm)" id="input-target-depth"/>
+        <label for="input-target-depth">奥行(mm)</label>
+        <input type="text" placeholder="奥行(mm)" id="input-target-depth"/>
     </div>
     <div>
         <button id="close-menu-button-large">OK</button>
