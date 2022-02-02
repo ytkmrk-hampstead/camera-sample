@@ -462,3 +462,8 @@ function menuChangeProduct() {
   document.querySelector('#input-target-height').value = height;
   document.querySelector('#input-target-depth').value = depth;
 }
+
+// Show default object
+document.querySelector('#input-product-type').selectedIndex = 1;
+menuChangeProduct();
+closeMenu();
