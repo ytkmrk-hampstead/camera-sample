@@ -20,6 +20,7 @@ let targetHeightInMM;
 let targetDepthInMM;
 let targetAspectRatio;
 let targetObjectConfiguration;
+let targetRatio = 1.5;
 
 let measureWidth;
 let measureHeight;
@@ -47,15 +48,14 @@ const showHelpers = false;
 const measureWidthInMM = 300;
 const measureHeightInMM = 50;
 
-const targetRatio = 1.5;
 const fontStyle = "14px sans-serif";
 
 const productsConfiguration = {
-  "T1": { size: { w: 799, h: 295, d: 385 }, object: { path: 'object/T1/' } }, // https://panasonic.jp/aircon/products/21x.html#size
-  "T2": { size: { w:1123, h: 682, d: 247 }, object: { path: 'object/T2/' } }, // https://panasonic.jp/viera/p-db/TH-50JX750_spec.html
-  "T3": { size: { w: 750, h:1828, d: 745 }, object: { path: 'object/T3/' } }, // https://panasonic.jp/reizo/p-db/NR-F657WPX_spec.html
-  "T4": { size: { w: 600, h:1020, d: 715 }, object: { path: 'object/T4/' } }, // https://kadenfan.hitachi.co.jp/wash/lineup/bd-sg100g/spec.html
-  "T5": { size: { w: 555, h:1025, d: 650 }, object: { path: 'object/T5/' } }  // https://jp.sharp/sentaku/products/estx8b_spec.html
+  "T1": { size: { w: 799, h: 295, d: 385 }, scale: 1.5, object: { path: 'object/T1/' } }, // https://panasonic.jp/aircon/products/21x.html#size
+  "T2": { size: { w:1123, h: 682, d: 247 }, scale: 1.5, object: { path: 'object/T2/' } }, // https://panasonic.jp/viera/p-db/TH-50JX750_spec.html
+  "T3": { size: { w: 750, h:1828, d: 745 }, scale: 1.5, object: { path: 'object/T3/' } }, // https://panasonic.jp/reizo/p-db/NR-F657WPX_spec.html
+  "T4": { size: { w: 600, h:1020, d: 715 }, scale: 2.0, object: { path: 'object/T4/' } }, // https://kadenfan.hitachi.co.jp/wash/lineup/bd-sg100g/spec.html
+  "T5": { size: { w: 555, h:1025, d: 650 }, scale: 2.0, object: { path: 'object/T5/' } }  // https://jp.sharp/sentaku/products/estx8b_spec.html
 };
 
 document.querySelector('#open-menu-button').onclick = openMenu;
@@ -455,8 +455,10 @@ function menuChangeProduct() {
     width = String(size.w);
     height = String(size.h);
     depth = String(size.d);
+    targetRatio = productsConfiguration[productType].scale;
     targetObjectConfiguration = productsConfiguration[productType].object;
   } else {
+    targetRatio = 1.5;
     targetObjectConfiguration = null;
   }
 
@@ -466,6 +468,6 @@ function menuChangeProduct() {
 }
 
 // Show default object
-document.querySelector('#input-product-type').selectedIndex = 1;
+document.querySelector('#input-product-type').selectedIndex = 4;
 menuChangeProduct();
 closeMenu();
