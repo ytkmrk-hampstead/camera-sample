@@ -468,6 +468,6 @@ function menuChangeProduct() {
 }
 
 // Show default object
-document.querySelector('#input-product-type').selectedIndex = 4;
+document.querySelector('#input-product-type').selectedIndex = 1;
 menuChangeProduct();
 closeMenu();
