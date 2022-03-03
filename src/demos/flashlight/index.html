@@ -5,12 +5,13 @@
     <title>Title</title>
 </head>
 <body>
-<button class="switch">On / Off</button>
+<button class="switch" style="width: 300px; height: 300px;">On / Off</button>
 </body>
 
 <script>
     //Test browser support
     const SUPPORTS_MEDIA_DEVICES = 'mediaDevices' in navigator;
+    let torched = false;
 
     if (SUPPORTS_MEDIA_DEVICES) {
         //Get the environment camera (usually the second one)
@@ -43,9 +44,12 @@
                     //let there be light!
                     const btn = document.querySelector('.switch');
                     btn.addEventListener('click', function(){
+                        torched = !torched;
                         track.applyConstraints({
-                            advanced: [{torch: true}]
+                            advanced: [{torch: torched}]
                         });
+
+                        console.log("torched:" + torched);
                     });
                 });
             });
